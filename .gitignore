@@ -1,0 +1,6 @@
+/local
+/vendor
+/slack-token
+/.bundle
+*.log
+
