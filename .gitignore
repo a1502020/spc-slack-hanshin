@@ -3,4 +3,5 @@
 /slack-token
 /.bundle
 *.log
+/hanshin
 

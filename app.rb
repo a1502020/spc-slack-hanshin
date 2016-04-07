@@ -1,5 +1,6 @@
 require 'slack-ruby-client'
 require 'logger'
+require './hanshin'
 
 
 FileUtils.mkdir('log') unless FileTest.exist?('log')
@@ -11,5 +12,13 @@ end
 
 wb_client = Slack::Web::Client.new(logger: Logger.new('log/wb-client.log'))
 
-p wb_client.auth_test
+hanshin = Hanshin.new
+
+ops = ['+', '-', '*', '/']
+ops.each do |op1|
+  ops.each do |op2|
+    expr = "3#{op1}3#{op2}4"
+    hanshin.set expr
+  end
+end
 
