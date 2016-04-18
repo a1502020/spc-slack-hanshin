@@ -1,5 +1,6 @@
 require 'slack-ruby-client'
 require 'logger'
+require 'json'
 require './hanshin'
 
 
@@ -11,14 +12,24 @@ Slack.configure do |conf|
 end
 
 wb_client = Slack::Web::Client.new(logger: Logger.new('log/wb-client.log'))
+rt_client = Slack::RealTime::Client.new(logger: Logger.new('log/rt-client.log'))
 
 hanshin = Hanshin.new
 
-ops = ['+', '-', '*', '/']
-ops.each do |op1|
-  ops.each do |op2|
-    expr = "3#{op1}3#{op2}4"
-    hanshin.set expr
+channels = JSON.parse(File.read('channels'))
+
+rt_client.on :message do |data|
+  next unless channels.include?(data['channel'])
+  md = /([1-9][0-9]*)/.match(data['text'])
+  next if md.nil?
+  v = md[1].to_i
+  expr = hanshin.get(v)
+  if expr.nil?
+    rt_client.message text: 'わかんない＞＜', channel: data['channel']
+  else
+    rt_client.message text: expr, channel: data['channel']
   end
 end
+
+rt_client.start!
 

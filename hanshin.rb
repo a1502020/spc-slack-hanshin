@@ -8,7 +8,7 @@ class Hanshin
     @file = file
     @hash = {334 => '334'}
     @rat = RatEvaluator.new
-    self.set_cost { |expr| expr.length }
+    self.set_cost { |l, r| l.length < r.length || (l.length == r.length && l.count('4') < r.count('4')) }
     if File.exists?(@file)
       self.load
     else
@@ -25,13 +25,13 @@ class Hanshin
   end
 
 
-  def set(expr)
+  def set(expr, with_save = true)
     rat = @rat.eval(expr)
     return nil if rat.denominator != 1
     n = rat.numerator
-    return nil if @hash.has_key?(n) && @cost.call(expr) >= @cost.call(@hash[n])
+    return nil if @hash.has_key?(n) && !@cost.call(expr, @hash[n])
     @hash[n] = expr
-    self.save
+    self.save if with_save
     return n
   end
 
