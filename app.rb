@@ -20,7 +20,7 @@ channels = JSON.parse(File.read('channels'))
 
 rt_client.on :message do |data|
   next unless channels.include?(data['channel'])
-  md = /([1-9][0-9]*)/.match(data['text'])
+  md = /([0-9]*)/.match(data['text'])
   next if md.nil?
   v = md[1].to_i
   expr = hanshin.get(v)
