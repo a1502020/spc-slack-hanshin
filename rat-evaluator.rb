@@ -50,6 +50,15 @@ class RatEvaluator
   def eval_fact
     res = Rational(0, 1)
     case next_ch
+    when '-'
+      @pos += 1
+      raise "parse error: expected number." unless ('0'..'9').include?(next_ch)
+      while ('0'..'9').include?(next_ch)
+        res *= 10
+        res += next_ch.to_i
+        @pos += 1
+      end
+      res *= -1
     when '0'..'9'
       while ('0'..'9').include?(next_ch)
         res *= 10
