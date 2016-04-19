@@ -18,18 +18,32 @@ hanshin = Hanshin.new
 
 channels = JSON.parse(File.read('channels'))
 
+p = /^(.*?)(-?[0-9]+)/
+
 rt_client.on :message do |data|
   next if data['user'] == rt_client.self['id']
   next unless channels.include?(data['channel'])
-  md = /([0-9]+)/.match(data['text'])
+  str = data['text']
+  md = str.match(p)
   next if md.nil?
-  v = md[1].to_i
-  expr = hanshin.get(v)
-  if expr.nil?
-    rt_client.message text: 'わかんない＞＜', channel: data['channel']
+  text = ''
+  if md[2] == str
+    v = md[2].to_i
+    expr = hanshin.get(v)
+    text += (expr.nil?) ? v : expr
   else
-    rt_client.message text: expr, channel: data['channel']
+    until md.nil?
+      v = md[2].to_i
+      expr = hanshin.get(v)
+      text += md[1] + ' ('
+      text += (expr.nil?) ? v : expr
+      text += ') '
+      str = str[(md[0].length)..(str.length)]
+      md = str.match(p)
+    end
+    text += str
   end
+  rt_client.message text: text, channel: data['channel']
 end
 
 rt_client.start!
