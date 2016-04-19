@@ -25,11 +25,32 @@ class Hanshin
   end
 
 
-  def set(expr, with_save = true)
+  def valid?(expr)
+    return false unless expr.match(/^[34\+\-\*\/\(\)]+$/)
+    arr = '334'
+    arr_i = 0
+    for i in 0..(expr.length) do
+      if expr[i] == '3' || expr[i] == '4'
+        return false if expr[i] != arr[arr_i]
+        arr_i = (arr_i + 1) % 3
+      end
+    end
+    return false if arr_i != 0
+    begin
+      @rat.eval(expr)
+    rescue
+      return false
+    end
+    return true
+  end
+
+
+  def set(expr, with_save = true, force = false)
+    return nil unless valid?(expr)
     rat = @rat.eval(expr)
     return nil if rat.denominator != 1
     n = rat.numerator
-    return nil if @hash.has_key?(n) && !@cost.call(expr, @hash[n])
+    return nil if !force && @hash.has_key?(n) && !@cost.call(expr, @hash[n])
     @hash[n] = expr
     self.save if with_save
     return n
