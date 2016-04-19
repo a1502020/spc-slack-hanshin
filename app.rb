@@ -43,15 +43,15 @@ rt_client.on :message do |data|
   if md[2] == str
     v = expr_to_v(md[2])
     post = true unless v.nil?
-    expr = $hanshin.get(v)
-    text += (expr.nil?) ? v : expr
+    expr = (v.nil?) ? nil : $hanshin.get(v)
+    text += (expr.nil?) ? ":no_good: #{v.to_s} :no_good:" : expr
   else
     until md.nil?
       v = expr_to_v(md[2])
       post = true unless v.nil?
       expr = (v.nil?) ? nil : $hanshin.get(v)
       text += md[1] + ' ('
-      text += (expr.nil?) ? v : expr
+      text += (expr.nil?) ? ":no_good: #{v.to_s} :no_good:" : expr
       text += ') '
       str = str[(md[0].length)..(str.length)]
       md = str.match(p_expr)
