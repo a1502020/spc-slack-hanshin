@@ -19,7 +19,7 @@ $hanshin = Hanshin.new
 $rat = RatEvaluator.new
 channels = JSON.parse(File.read('channels'))
 
-p_expr = /^(.*?)([0-9\+\-\*\/\(\)]+)/
+$p_expr = /^(.*?)([0-9\+\-\*\/\(\)]+)/
 
 def expr_to_v(expr)
   $hanshin.set expr
@@ -32,14 +32,10 @@ def expr_to_v(expr)
   return v.numerator
 end
 
-rt_client.on :message do |data|
-  next if data['user'] == rt_client.self['id']
-  next unless channels.include?(data['channel'])
-  str = data['text']
-  md = str.match(p_expr)
-  next if md.nil?
+def str_to_hanshin(str)
+  md = str.match($p_expr)
+  return nil if md.nil?
   text = ''
-  post = false
   if md[2] == str
     v = expr_to_v(md[2])
     post = true unless v.nil?
@@ -54,11 +50,25 @@ rt_client.on :message do |data|
       text += (expr.nil?) ? ":no_good: #{v.to_s} :no_good:" : expr
       text += ') '
       str = str[(md[0].length)..(str.length)]
-      md = str.match(p_expr)
+      md = str.match($p_expr)
     end
     text += str
   end
-  rt_client.message text: text, channel: data['channel'] if post
+  return post ? text : nil
+end
+
+rt_client.on :message do |data|
+  next if data['user'] == rt_client.self['id']
+  next unless channels.include?(data['channel'])
+  res = str_to_hanshin(data['text'])
+  if res.nil?
+    if data['text'].include?('時')
+      str = DateTime.now.strftime('%Y年%m月%d日 %H時%M分%S秒')
+      rt_client.message text: str_to_hanshin(str), channel: data['channel']
+    end
+  else
+    rt_client.message text: res, channel: data['channel']
+  end
 end
 
 rt_client.start!
