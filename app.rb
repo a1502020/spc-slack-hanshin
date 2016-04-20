@@ -60,6 +60,10 @@ end
 rt_client.on :message do |data|
   next if data['user'] == rt_client.self['id']
   next unless channels.include?(data['channel'])
+  if data['text'].strip == '33-4'
+    rt_client.message text: 'なんでや！阪神関係ないやろ！', channel: data['channel']
+    next
+  end
   res = str_to_hanshin(data['text'])
   if res.nil?
     if data['text'].include?('時') || data['text'].include?('日')
