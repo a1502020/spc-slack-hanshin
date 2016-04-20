@@ -62,7 +62,7 @@ rt_client.on :message do |data|
   next unless channels.include?(data['channel'])
   res = str_to_hanshin(data['text'])
   if res.nil?
-    if data['text'].include?('時')
+    if data['text'].include?('時') || data['text'].include?('日')
       str = DateTime.now.strftime('%Y年%m月%d日 %H時%M分%S秒')
       rt_client.message text: str_to_hanshin(str), channel: data['channel']
     end
