@@ -19,6 +19,11 @@ $hanshin = Hanshin.new
 $rat = RatEvaluator.new
 channels = JSON.parse(File.read('channels'))
 
+$repl_tbl = {
+  /０/ => '0', /１/ => '1', /２/ => '2', /３/ => '3', /４/ => '4',
+  /５/ => '5', /６/ => '6', /７/ => '7', /８/ => '8', /９/ => '9',
+  /＋/ => '+', /－/ => '-', /×/ => '*', /÷/ => '/', /＊/ => '*'
+}
 $p_expr = /^(.*?)([0-9\+\-\*\/\(\)]+)/
 
 def expr_to_v(expr)
@@ -33,6 +38,9 @@ def expr_to_v(expr)
 end
 
 def str_to_hanshin(str)
+  $repl_tbl.each do |k, v|
+    str.gsub!(k, v)
+  end
   md = str.match($p_expr)
   return nil if md.nil?
   text = ''
