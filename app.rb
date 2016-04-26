@@ -72,6 +72,16 @@ rt_client.on :message do |data|
     rt_client.message text: 'なんでや！阪神関係ないやろ！', channel: data['channel']
     next
   end
+  md_fb = data['text'].strip.match(/^FizzBuzz ([0-9\+\-\*\/\(\)]+)$/)
+  unless md_fb.nil?
+    v = expr_to_v(md_fb[1])
+    break if v.nil?
+    v = 100 if v > 100
+    han = Hanshin.new
+    res = str_to_hanshin((1..v).map { |i| i % 3 == 0 ? (i % 5 == 0 ? 'FizzBuzz' : 'Fizz') : (i % 5 == 0 ? 'Buzz' : i) }.join(' '))
+    rt_client.message text: res, channel: data['channel']
+    next
+  end
   res = str_to_hanshin(data['text'])
   if res.nil?
     if data['text'].include?('時') || data['text'].include?('日')
