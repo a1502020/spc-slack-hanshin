@@ -72,7 +72,7 @@ rt_client.on :message do |data|
     rt_client.message text: 'なんでや！阪神関係ないやろ！', channel: data['channel']
     next
   end
-  md_fb = data['text'].strip.match(/^FizzBuzz ([0-9\+\-\*\/\(\)]+)$/)
+  md_fb = data['text'].strip.downcase.match(/^fizzbuzz ([0-9\+\-\*\/\(\)]+)$/)
   unless md_fb.nil?
     v = expr_to_v(md_fb[1])
     break if v.nil?
