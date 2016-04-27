@@ -38,6 +38,10 @@ def expr_to_v(expr)
 end
 
 def str_to_hanshin(str)
+  list = str.split("\n")
+  if list.count >= 2
+    return list.map { |s| str_to_hanshin(s) }.join("\n")
+  end
   $repl_tbl.each do |k, v|
     str.gsub!(k, v)
   end
