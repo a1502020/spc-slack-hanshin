@@ -24,7 +24,9 @@ $repl_tbl = {
   /５/ => '5', /６/ => '6', /７/ => '7', /８/ => '8', /９/ => '9',
   /＋/ => '+', /－/ => '-', /×/ => '*', /÷/ => '/', /＊/ => '*'
 }
+$dice = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅']
 $p_expr = /^(.*?)([0-9\+\-\*\/\(\)]+)/
+$p_dice = /^(.*?)(サイコロ|[dD][iI][cC][eE])/
 
 def expr_to_v(expr)
   $hanshin.set expr
@@ -69,6 +71,19 @@ def str_to_hanshin(str)
   return post ? text : nil
 end
 
+def str_to_dice(str)
+  res = ''
+  md = $p_dice.match(str)
+  until md.nil?
+    res += md[1]
+    res += $dice[rand(6)]
+    str = str[(md[0].length)..(str.length)]
+    md = $p_dice.match(str)
+  end
+  res += str
+  return res
+end
+
 rt_client.on :message do |data|
   next if data['user'] == rt_client.self['id']
   next unless channels.include?(data['channel'])
@@ -86,7 +101,9 @@ rt_client.on :message do |data|
     rt_client.message text: res, channel: data['channel']
     next
   end
-  res = str_to_hanshin(data['text'])
+  res1 = str_to_dice(data['text'])
+  res = str_to_hanshin(res1)
+  res = res1 if res.nil? && res1 != data['text']
   if res.nil?
     if data['text'].include?('時') || data['text'].include?('日')
       str = DateTime.now.strftime('%Y年%m月%d日 %H時%M分%S秒')
