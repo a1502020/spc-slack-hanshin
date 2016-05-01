@@ -27,6 +27,8 @@ $repl_tbl = {
 $dice = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅']
 $p_expr = /^(.*?)([0-9\+\-\*\/\(\)]+)/
 $p_dice = /^(.*?)(サイコロ|[dD][iI][cC][eE])/
+$p_dicek = /^(.*?)(:dicek)/
+$p_daisuke = /^(.*?)(:daisuke:)/
 
 def expr_to_v(expr)
   $hanshin.set expr
@@ -73,12 +75,34 @@ end
 
 def str_to_dice(str)
   res = ''
+  md = $p_dicek.match(str)
+  until md.nil?
+    res += md[1]
+    res += ':daisuke:'
+    str = str[(md[0].length)..(str.length)]
+    md = $p_dicek.match(str)
+  end
+  res += str
+  str = res
+
+  res = ''
   md = $p_dice.match(str)
   until md.nil?
     res += md[1]
     res += $dice[rand(6)]
     str = str[(md[0].length)..(str.length)]
     md = $p_dice.match(str)
+  end
+  res += str
+  str = res
+
+  res = ''
+  md = $p_daisuke.match(str)
+  until md.nil?
+    res += md[1]
+    res += ':dicek:'
+    str = str[(md[0].length)..(str.length)]
+    md = $p_daisuke.match(str)
   end
   res += str
   return res
